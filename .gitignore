@@ -1,0 +1,3 @@
+*.pyc
+parselab.egg-info/
+dist/*.tar.gz
