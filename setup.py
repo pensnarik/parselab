@@ -4,6 +4,9 @@ from setuptools import setup, Command
 from setuptools.command.install import install
 from distutils.util import convert_path
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 def get_version():
     d = {}
     with open('parselab/__init__.py') as fp:
@@ -13,7 +16,9 @@ def get_version():
 
 setup(name="parselab",
       description="Parselab helper module",
-      license="Commercial",
+      long_description=long_description,
+      long_description_content_type="text/markdown",
+      license="BSD3",
       version=get_version(),
       maintainer="Andrei Zhidenkov",
       maintainer_email="pensnarik@gmail.com",
