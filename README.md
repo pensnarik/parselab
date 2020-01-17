@@ -2,6 +2,12 @@
 
 This package contains classes that help to write parsers in Python.
 
+## Installation
+
+```bash
+pip3 install parselab
+```
+
 ## Usage
 
 To use `parelab` just create a class derived from `BasicParser`.
