@@ -1,4 +1,4 @@
-https://img.shields.io/pypi/v/parselab
+[![PyPi version](https://img.shields.io/pypi/v/parselab)](https://pypi.org/project/parselab/)
 
 # parselab
 
