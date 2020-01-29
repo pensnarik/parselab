@@ -1,4 +1,5 @@
 [![PyPi version](https://img.shields.io/pypi/v/parselab)](https://pypi.org/project/parselab/)
+[![Build Status](https://travis-ci.org/pensnarik/parselab.svg?branch=master)](https://travis-ci.org/pensnarik/parselab)
 
 # parselab
 
