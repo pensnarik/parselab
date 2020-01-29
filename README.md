@@ -1,3 +1,5 @@
+https://img.shields.io/pypi/v/parselab
+
 # parselab
 
 This package contains classes that help to write parsers in Python.
