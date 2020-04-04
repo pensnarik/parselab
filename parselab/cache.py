@@ -5,6 +5,8 @@ import sys
 import hashlib
 import logging
 
+from parselab.network import PageNotFound
+
 __all__ = ['CacheInterface', 'MockCache', 'FileCache']
 
 logger = logging.getLogger(__name__)
@@ -71,22 +73,11 @@ class FileCache(CacheInterface):
             hash = hashlib.md5(url.encode('utf-8')).hexdigest()
         return os.path.join(self.get_cache_path(), hash[0], hash[0:2], hash)
 
-    def get_cached_filename_compat(self, url):
-        if sys.version_info[0] < 3:
-            hash = hashlib.md5(url).hexdigest()
-        else:
-            hash = hashlib.md5(url.encode('utf-8')).hexdigest()
-        return os.path.join(self.get_cache_path(), hash)
-
     def get_file_size(self, url):
         statinfo = os.stat(self.get_cached_filename(url))
         return statinfo.st_size
 
     def is_in_cache(self, url):
-        if os.path.exists(self.get_cached_filename_compat(url)):
-            os.rename(self.get_cached_filename_compat(url), self.get_cached_filename(url))
-            return self.get_file_size(url) > 0
-
         return os.path.exists(self.get_cached_filename(url)) and self.get_file_size(url) > 0
 
     def is_in_cache_error(self, url):
@@ -96,8 +87,18 @@ class FileCache(CacheInterface):
         with open('%s.error' % self.get_cached_filename(url), 'wt') as f:
             f.write(error)
 
+    def get_error_from_cache(self, url):
+        if not self.is_in_cache_error(url):
+            return None
+
+        with open('%s.error' % self.get_cached_filename(url), 'rt') as f:
+            return f.read()
+
     def get_file(self, url, binary=False):
         if self.is_in_cache_error(url):
+            error = self.get_error_from_cache(url)
+            if error == 'PageNotFound':
+                raise PageNotFound()
             return None
 
         if binary:
@@ -131,7 +132,3 @@ class FileCache(CacheInterface):
         """
         os.remove(self.get_cached_filename(url))
         logger.warning('File %s has been removed from cache' % self.get_cached_filename(url))
-
-# Depricated class name, for compability
-class CacheConsumer(FileCache):
-    pass

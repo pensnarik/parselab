@@ -8,6 +8,7 @@ import random
 
 from parselab.db import Database
 from parselab.cache import CacheInterface
+from parselab.network import PageNotFound
 
 logger = logging.getLogger(__name__)
 
@@ -48,14 +49,22 @@ class BasicParser(object):
             logger.info('Page found in cache: %s' % self.cache.get_cached_filename(url))
             data = self.cache.get_file(url, binary)
             if data is None:
-                raise PageDownloadException('Cache error')
+                raise PageDownloadException('Cache error, filename: %s' % self.cache.get_cached_filename(url))
             self.is_cache_used = True
             return data
+        elif self.cache.is_in_cache_error(url):
+            if self.cache.get_error_from_cache(url) == 'PageNotFound':
+                raise PageNotFound()
         else:
             logger.info('Page was not found in cache')
             tries = 3
             while tries > 0:
-                data = self.net.download_page(url, cookies=self.get_cookies(), binary=binary)
+                try:
+                    data = self.net.download_page(url, cookies=self.get_cookies(), binary=binary)
+                except PageNotFound:
+                    # We report this error to cache in order to save time in the future
+                    self.cache.save_error_in_cache(url, 'PageNotFound')
+                    raise
 
                 if self.is_captcha_required(data):
                     self.solve_captcha(data)
